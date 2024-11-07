@@ -1,0 +1,328 @@
+[
+    {
+        "id": "asst_LBmI728dZK4IaH7mDlcETptW",
+        "created_at": 1730925226,
+        "description": "Verantwortlich f\u00fcr Fallstrategien und Dokumentenverwaltung",
+        "instructions": "agency_manifesto.md\n\n# Agent Role\nDer Case Manager ist verantwortlich f\u00fcr die strategische F\u00fchrung von Rechtsf\u00e4llen und die Koordination zwischen allen beteiligten Parteien.\n\n# Goals\n1. Entwicklung effektiver Fallstrategien\n2. Erstellung und Verwaltung rechtlicher Dokumente\n3. Koordination mit Legal Research und Court Analyzer\n4. Optimierung der Erfolgschancen f\u00fcr jeden Fall\n\n# Process Workflow\n1. Fallanalyse durchf\u00fchren\n   - Alle relevanten Dokumente und Informationen sammeln\n   - Erste Strategieeinsch\u00e4tzung mit OpenAI durchf\u00fchren\n\n2. Recherche koordinieren\n   - Rechtliche Trends beim Legal Research Agent anfragen\n   - Gerichtliche Analysen beim Court Analyzer Agent anfordern\n\n3. Strategie entwickeln\n   - Erkenntnisse aus der Recherche auswerten\n   - Strategievorschl\u00e4ge mit OpenAI generieren\n   - Strategien mit Mandanten abstimmen\n\n4. Dokumente erstellen\n   - Schrifts\u00e4tze in Markdown verfassen\n   - Dokumente basierend auf Feedback \u00fcberarbeiten\n\n5. Fortlaufende Optimierung\n   - Strategien basierend auf neuen Erkenntnissen anpassen\n   - Dokumentation kontinuierlich aktualisieren ",
+        "metadata": {},
+        "model": "gpt-4o-2024-08-06",
+        "name": "Case Manager",
+        "object": "assistant",
+        "tools": [
+            {
+                "function": {
+                    "name": "OpenAIStrategy",
+                    "description": "Tool zur Entwicklung von Fallstrategien mit OpenAI's Preview-Modell.",
+                    "parameters": {
+                        "properties": {
+                            "case_description": {
+                                "description": "Beschreibung des aktuellen Rechtsfalls",
+                                "title": "Case Description",
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "case_description"
+                        ],
+                        "type": "object"
+                    },
+                    "strict": false
+                },
+                "type": "function"
+            },
+            {
+                "function": {
+                    "name": "DocumentManager",
+                    "description": "Tool zum Erstellen und Bearbeiten von rechtlichen Dokumenten in Markdown.",
+                    "parameters": {
+                        "properties": {
+                            "document_name": {
+                                "description": "Name des zu erstellenden/bearbeitenden Dokuments",
+                                "title": "Document Name",
+                                "type": "string"
+                            },
+                            "content": {
+                                "description": "Inhalt des Dokuments in Markdown-Format",
+                                "title": "Content",
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "content",
+                            "document_name"
+                        ],
+                        "type": "object"
+                    },
+                    "strict": false
+                },
+                "type": "function"
+            },
+            {
+                "function": {
+                    "name": "SendMessage",
+                    "description": "Use this tool to facilitate direct, synchronous communication between specialized agents within your agency. When you send a message using this tool, you receive a response exclusively from the designated recipient agent. To continue the dialogue, invoke this tool again with the desired recipient agent and your follow-up message. Remember, communication here is synchronous; the recipient agent won't perform any tasks post-response. You are responsible for relaying the recipient agent's responses back to the user, as the user does not have direct access to these replies. Keep engaging with the tool for continuous interaction until the task is fully resolved. Do not send more than 1 message at a time.",
+                    "parameters": {
+                        "$defs": {
+                            "recipient": {
+                                "enum": [
+                                    "Legal Research Agent",
+                                    "Court Analyzer"
+                                ],
+                                "title": "recipient",
+                                "type": "string"
+                            }
+                        },
+                        "properties": {
+                            "my_primary_instructions": {
+                                "description": "Please repeat your primary instructions step-by-step, including both completed and the following next steps that you need to perform. For multi-step, complex tasks, first break them down into smaller steps yourself. Then, issue each step individually to the recipient agent via the message parameter. Each identified step should be sent in separate message. Keep in mind, that the recipient agent does not have access to these instructions. You must include recipient agent-specific instructions in the message or additional_instructions parameters.",
+                                "title": "My Primary Instructions",
+                                "type": "string"
+                            },
+                            "recipient": {
+                                "allOf": [
+                                    {
+                                        "$ref": "#/$defs/recipient"
+                                    }
+                                ],
+                                "description": "Legal Research Agent: Spezialist f\u00fcr rechtliche Recherche und Trendanalyse\nCourt Analyzer: Experte f\u00fcr die Analyse von Gerichtsentscheidungen und -trends\n"
+                            },
+                            "message": {
+                                "description": "Specify the task required for the recipient agent to complete. Focus on clarifying what the task entails, rather than providing exact instructions.",
+                                "title": "Message",
+                                "type": "string"
+                            },
+                            "message_files": {
+                                "anyOf": [
+                                    {
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "type": "array"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ],
+                                "default": null,
+                                "description": "A list of file ids to be sent as attachments to this message. Only use this if you have the file id that starts with 'file-'.",
+                                "examples": [
+                                    "file-1234",
+                                    "file-5678"
+                                ],
+                                "title": "Message Files"
+                            },
+                            "additional_instructions": {
+                                "anyOf": [
+                                    {
+                                        "type": "string"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ],
+                                "default": null,
+                                "description": "Additional context or instructions for the recipient agent about the task. For example, additional information provided by the user or other agents.",
+                                "title": "Additional Instructions"
+                            }
+                        },
+                        "required": [
+                            "message",
+                            "my_primary_instructions",
+                            "recipient"
+                        ],
+                        "type": "object"
+                    },
+                    "strict": false
+                },
+                "type": "function"
+            }
+        ],
+        "response_format": "auto",
+        "temperature": 0.7,
+        "tool_resources": {
+            "code_interpreter": null,
+            "file_search": null
+        },
+        "top_p": 1.0
+    },
+    {
+        "id": "asst_20TZUu6F0K68lDbi0WcmQ90j",
+        "created_at": 1730925226,
+        "description": "Spezialist f\u00fcr rechtliche Recherche und Trendanalyse",
+        "instructions": "agency_manifesto.md\n\n# Agent Role\nDer Legal Research Agent ist f\u00fcr die umfassende rechtliche Recherche und Analyse aktueller juristischer Trends verantwortlich.\n\n# Goals\n1. Identifizierung relevanter Rechtsprechung und Literatur\n2. Analyse aktueller juristischer Trends\n3. Erstellung detaillierter Rechercheberichte\n4. Unterst\u00fctzung des Case Managers mit fundierter Recherche\n\n# Process Workflow\n1. Initiale Recherche\n   - Tavily-API f\u00fcr Prim\u00e4rrecherche nutzen\n   - Relevante Quellen identifizieren\n\n2. Textanalyse\n   - Schl\u00fcsselw\u00f6rter aus Dokumenten extrahieren\n   - Wichtige rechtliche Konzepte identifizieren\n\n3. Trendanalyse\n   - Entwicklungen in der Rechtsprechung verfolgen\n   - Neue rechtliche Argumentationen identifizieren\n\n4. Berichterstellung\n   - Rechercheergebnisse zusammenfassen\n   - Handlungsempfehlungen formulieren\n   - Bericht an Case Manager \u00fcbermitteln ",
+        "metadata": {},
+        "model": "gpt-4o-2024-08-06",
+        "name": "Legal Research Agent",
+        "object": "assistant",
+        "tools": [
+            {
+                "function": {
+                    "name": "TavilySearch",
+                    "description": "Tool zur Durchf\u00fchrung von Rechtsrecherchen mit der Tavily-API.",
+                    "parameters": {
+                        "properties": {
+                            "query": {
+                                "description": "Suchanfrage f\u00fcr die rechtliche Recherche",
+                                "title": "Query",
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "query"
+                        ],
+                        "type": "object"
+                    },
+                    "strict": false
+                },
+                "type": "function"
+            },
+            {
+                "function": {
+                    "name": "KeywordExtractor",
+                    "description": "Tool zur Extraktion von Schl\u00fcsselw\u00f6rtern aus juristischen Texten.",
+                    "parameters": {
+                        "properties": {
+                            "text": {
+                                "description": "Juristischer Text zur Analyse",
+                                "title": "Text",
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "text"
+                        ],
+                        "type": "object"
+                    },
+                    "strict": false
+                },
+                "type": "function"
+            },
+            {
+                "function": {
+                    "name": "SendMessage",
+                    "description": "Use this tool to facilitate direct, synchronous communication between specialized agents within your agency. When you send a message using this tool, you receive a response exclusively from the designated recipient agent. To continue the dialogue, invoke this tool again with the desired recipient agent and your follow-up message. Remember, communication here is synchronous; the recipient agent won't perform any tasks post-response. You are responsible for relaying the recipient agent's responses back to the user, as the user does not have direct access to these replies. Keep engaging with the tool for continuous interaction until the task is fully resolved. Do not send more than 1 message at a time.",
+                    "parameters": {
+                        "$defs": {
+                            "recipient": {
+                                "const": "Court Analyzer",
+                                "enum": [
+                                    "Court Analyzer"
+                                ],
+                                "title": "recipient",
+                                "type": "string"
+                            }
+                        },
+                        "properties": {
+                            "my_primary_instructions": {
+                                "description": "Please repeat your primary instructions step-by-step, including both completed and the following next steps that you need to perform. For multi-step, complex tasks, first break them down into smaller steps yourself. Then, issue each step individually to the recipient agent via the message parameter. Each identified step should be sent in separate message. Keep in mind, that the recipient agent does not have access to these instructions. You must include recipient agent-specific instructions in the message or additional_instructions parameters.",
+                                "title": "My Primary Instructions",
+                                "type": "string"
+                            },
+                            "recipient": {
+                                "allOf": [
+                                    {
+                                        "$ref": "#/$defs/recipient"
+                                    }
+                                ],
+                                "description": "Court Analyzer: Experte f\u00fcr die Analyse von Gerichtsentscheidungen und -trends\n"
+                            },
+                            "message": {
+                                "description": "Specify the task required for the recipient agent to complete. Focus on clarifying what the task entails, rather than providing exact instructions.",
+                                "title": "Message",
+                                "type": "string"
+                            },
+                            "message_files": {
+                                "anyOf": [
+                                    {
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "type": "array"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ],
+                                "default": null,
+                                "description": "A list of file ids to be sent as attachments to this message. Only use this if you have the file id that starts with 'file-'.",
+                                "examples": [
+                                    "file-1234",
+                                    "file-5678"
+                                ],
+                                "title": "Message Files"
+                            },
+                            "additional_instructions": {
+                                "anyOf": [
+                                    {
+                                        "type": "string"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ],
+                                "default": null,
+                                "description": "Additional context or instructions for the recipient agent about the task. For example, additional information provided by the user or other agents.",
+                                "title": "Additional Instructions"
+                            }
+                        },
+                        "required": [
+                            "message",
+                            "my_primary_instructions",
+                            "recipient"
+                        ],
+                        "type": "object"
+                    },
+                    "strict": false
+                },
+                "type": "function"
+            }
+        ],
+        "response_format": "auto",
+        "temperature": 0.7,
+        "tool_resources": {
+            "code_interpreter": null,
+            "file_search": null
+        },
+        "top_p": 1.0
+    },
+    {
+        "id": "asst_M76BpOFehNlEEtO2ZBy3lhrF",
+        "created_at": 1730925229,
+        "description": "Experte f\u00fcr die Analyse von Gerichtsentscheidungen und -trends",
+        "instructions": "agency_manifesto.md\n\n# Agent Role\nDer Court Analyzer ist spezialisiert auf die Analyse von Gerichtsentscheidungen und die Identifikation von Erfolgsmustern in der Rechtsprechung.\n\n# Goals\n1. Analyse von Gerichtsentscheidungen\n2. Identifikation erfolgreicher Argumentationsstrategien\n3. Erkennung von Trends in der Rechtsprechung\n4. Bereitstellung von datenbasierten Entscheidungsgrundlagen\n\n# Process Workflow\n1. Entscheidungsanalyse\n   - Sentiment-Analyse durchf\u00fchren\n   - Schl\u00fcsselargumente identifizieren\n   - Erfolgsquoten berechnen\n\n2. Trendanalyse\n   - Muster in Gerichtsentscheidungen erkennen\n   - Erfolgreiche Strategien identifizieren\n   - Risikofaktoren bewerten\n\n3. Berichterstattung\n   - Analyseergebnisse zusammenfassen\n   - Handlungsempfehlungen formulieren\n   - Erkenntnisse an Case Manager \u00fcbermitteln ",
+        "metadata": {},
+        "model": "gpt-4o-2024-08-06",
+        "name": "Court Analyzer",
+        "object": "assistant",
+        "tools": [
+            {
+                "function": {
+                    "name": "CourtAnalysis",
+                    "description": "Analysiert Gerichtsentscheidungen und extrahiert wichtige Informationen sowie Stimmung.",
+                    "parameters": {
+                        "properties": {
+                            "text": {
+                                "description": "Der zu analysierende Gerichtstext",
+                                "title": "Text",
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "text"
+                        ],
+                        "type": "object"
+                    },
+                    "strict": false
+                },
+                "type": "function"
+            }
+        ],
+        "response_format": "auto",
+        "temperature": 0.7,
+        "tool_resources": {
+            "code_interpreter": null,
+            "file_search": null
+        },
+        "top_p": 1.0
+    }
+]

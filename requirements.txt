@@ -1,0 +1,10 @@
+agency-swarm
+openai>=1.0.0
+python-dotenv
+tavily-python
+nltk
+textblob-de
+pandas
+pathlib
+pydantic>=2.0.0
+germansentiment
